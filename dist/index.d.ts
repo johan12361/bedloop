@@ -1,0 +1,48 @@
+interface ConversationMessage {
+    id: number;
+    thread_id: number | null;
+    in_out: number;
+    message: string;
+    external_id: string | null;
+    type: string | null;
+    created_at: string;
+}
+
+declare enum EventType {
+    NEW_MESSAGE = "new_message"
+}
+interface BedloopEvent {
+    event: EventType;
+    timestamp: Date;
+    newMessage?: {
+        bookingId?: number;
+        conversationId?: number;
+        messageId?: number;
+        message?: ConversationMessage;
+    };
+}
+
+interface ClientOptions {
+    user: string;
+    password: string;
+    url: string;
+    debug?: boolean;
+}
+interface PollingOptions {
+    interval: number;
+    beforeDays: number;
+    afterDays: number;
+}
+
+declare class Client {
+    readonly options: ClientOptions;
+    readonly pollingOptions: PollingOptions;
+    private authorization?;
+    private tokenRefreshInterval?;
+    constructor(options: ClientOptions, pollingOptions?: Partial<PollingOptions>);
+    private refreshToken;
+    connect(callback: (events: BedloopEvent[]) => void): Promise<void>;
+    disconnect(): void;
+}
+
+export { type BedloopEvent, Client, type ClientOptions, EventType, type PollingOptions };
