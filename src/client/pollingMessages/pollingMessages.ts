@@ -61,7 +61,7 @@ export async function pollingMessages(
 
             if (conversations.length === 0) return []
 
-            return filterNewMessages(conversations, booking.booking_number, messagesCache)
+            return filterNewMessages(conversations, booking.booking_number, messagesCache, pollingOptions.recentMinutes)
           } catch (error) {
             if (debug) {
               console.error(`Error getting messages for booking ${booking.booking_number}:`, error)

@@ -7,7 +7,8 @@ import type { ClientOptions, Authorization, PollingOptions } from '../types/clie
 const defaultPollingOptions: PollingOptions = {
   interval: 5000, // 5 segundos
   beforeDays: 7,
-  afterDays: 30
+  afterDays: 30,
+  recentMinutes: 15
 }
 
 export class Client {

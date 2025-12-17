@@ -32,6 +32,7 @@ interface PollingOptions {
     interval: number;
     beforeDays: number;
     afterDays: number;
+    recentMinutes?: number;
 }
 
 declare class Client {

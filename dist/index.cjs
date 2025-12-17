@@ -256,7 +256,7 @@ async function pollingMessages(clientConfig, getAuthorization2, pollingOptions, 
           try {
             const conversations = await getMessages(baseUrl, token, String(booking.booking_number));
             if (conversations.length === 0) return [];
-            return filterNewMessages(conversations, booking.booking_number, messagesCache);
+            return filterNewMessages(conversations, booking.booking_number, messagesCache, pollingOptions.recentMinutes);
           } catch (error) {
             if (debug) {
               console.error(`Error getting messages for booking ${booking.booking_number}:`, error);
@@ -296,7 +296,8 @@ var defaultPollingOptions = {
   interval: 5e3,
   // 5 segundos
   beforeDays: 7,
-  afterDays: 30
+  afterDays: 30,
+  recentMinutes: 15
 };
 var Client = class {
   constructor(options, pollingOptions = {}) {
