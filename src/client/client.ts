@@ -1,9 +1,12 @@
 import { getAuthorization } from './auth/getAuthorization.js'
 import { pollingMessages } from './pollingMessages/pollingMessages.js'
 import { getDestinations } from './request/getDestinations.js'
+import { getListings } from './request/getListings.js'
 
 import type { BedloopEvent } from '../types/events.js'
 import type { Destination } from '../types/destination.js'
+import type { Listing } from '../types/listing.js'
+
 import type { ClientOptions, Authorization, PollingOptions } from '../types/client.js'
 
 // default polling options
@@ -73,6 +76,11 @@ export class Client {
   async getDestinations(): Promise<Destination[]> {
     const auth = await this.getAuthorization()
     return getDestinations(this.options.url, auth.token)
+  }
+
+  async getListings(): Promise<Listing[]> {
+    const auth = await this.getAuthorization()
+    return getListings(this.options.url, auth.token)
   }
 
   disconnect(): void {

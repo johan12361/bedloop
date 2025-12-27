@@ -309,6 +309,24 @@ async function getDestinations(baseUrl, token) {
   return response.data.data;
 }
 
+// src/client/request/getListings.ts
+var import_axios5 = __toESM(require("axios"), 1);
+async function getListings(baseUrl, token) {
+  const url = `${baseUrl}/api/v1/listings`;
+  const headers = {
+    Accept: "application/json",
+    Authorization: `Bearer ${token}`
+  };
+  const response = await import_axios5.default.get(url, { headers });
+  if (!response.data) {
+    throw new Error("No data received from getBookingByDate");
+  }
+  if (!Array.isArray(response.data.data)) {
+    throw new Error("Invalid data format received from getBookingByDate");
+  }
+  return response.data.data;
+}
+
 // src/client/client.ts
 var defaultPollingOptions = {
   interval: 5e3,
@@ -363,6 +381,10 @@ var Client = class {
   async getDestinations() {
     const auth = await this.getAuthorization();
     return getDestinations(this.options.url, auth.token);
+  }
+  async getListings() {
+    const auth = await this.getAuthorization();
+    return getListings(this.options.url, auth.token);
   }
   disconnect() {
     if (this.tokenRefreshInterval) {
