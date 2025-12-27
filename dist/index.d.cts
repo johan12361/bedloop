@@ -22,6 +22,16 @@ interface BedloopEvent {
     };
 }
 
+interface Destination {
+    id: number;
+    id2?: string;
+    name?: string;
+    tourist_tax?: string;
+    latitude?: number;
+    longitude?: number;
+    max_days?: number;
+}
+
 interface ClientOptions {
     user: string;
     password: string;
@@ -48,6 +58,7 @@ declare class Client {
     private refreshToken;
     getAuthorization(): Promise<Authorization>;
     connect(callback: (events: BedloopEvent[]) => void): Promise<void>;
+    getDestinations(): Promise<Destination[]>;
     disconnect(): void;
 }
 

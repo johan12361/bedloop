@@ -254,6 +254,24 @@ async function pollingMessages(clientConfig, getAuthorization2, pollingOptions, 
   }, pollingOptions.interval);
 }
 
+// src/client/request/getDestinations.ts
+import axios4 from "axios";
+async function getDestinations(baseUrl, token) {
+  const url = `${baseUrl}/api/v1/destinations`;
+  const headers = {
+    Accept: "application/json",
+    Authorization: `Bearer ${token}`
+  };
+  const response = await axios4.get(url, { headers });
+  if (!response.data) {
+    throw new Error("No data received from getBookingByDate");
+  }
+  if (!Array.isArray(response.data.data)) {
+    throw new Error("Invalid data format received from getBookingByDate");
+  }
+  return response.data.data;
+}
+
 // src/client/client.ts
 var defaultPollingOptions = {
   interval: 5e3,
@@ -304,6 +322,10 @@ var Client = class {
       12 * 60 * 60 * 1e3
     );
     pollingMessages(this.options, () => this.authorization, this.pollingOptions, callback);
+  }
+  async getDestinations() {
+    const auth = await this.getAuthorization();
+    return getDestinations(this.options.url, auth.token);
   }
   disconnect() {
     if (this.tokenRefreshInterval) {
