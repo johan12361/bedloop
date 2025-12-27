@@ -28,6 +28,10 @@ interface ClientOptions {
     url: string;
     debug?: boolean;
 }
+interface Authorization {
+    token: string;
+    expiresAt: Date;
+}
 interface PollingOptions {
     interval: number;
     beforeDays: number;
@@ -42,6 +46,7 @@ declare class Client {
     private tokenRefreshInterval?;
     constructor(options: ClientOptions, pollingOptions?: Partial<PollingOptions>);
     private refreshToken;
+    getAuthorization(): Promise<Authorization>;
     connect(callback: (events: BedloopEvent[]) => void): Promise<void>;
     disconnect(): void;
 }

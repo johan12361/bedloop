@@ -42,8 +42,16 @@ export class Client {
     }
   }
 
+  async getAuthorization(): Promise<Authorization> {
+    const now = new Date()
+    if (!this.authorization || this.authorization.expiresAt <= now) {
+      this.authorization = await getAuthorization(this.options)
+    }
+    return this.authorization
+  }
+
   async connect(callback: (events: BedloopEvent[]) => void): Promise<void> {
-    this.authorization = await getAuthorization(this.options)
+    await this.getAuthorization()
     if (this.options.debug) {
       console.log('Connected:', this.authorization)
     }
