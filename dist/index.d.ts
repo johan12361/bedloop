@@ -80,6 +80,17 @@ interface Listing {
     tourist_tax?: string;
 }
 
+interface Photo {
+    id: number;
+    listing_id: number;
+    name: string;
+    zone: string;
+    type: number;
+    position: number;
+    alt_text: string;
+    title: string;
+}
+
 interface ClientOptions {
     user: string;
     password: string;
@@ -108,6 +119,7 @@ declare class Client {
     connect(callback: (events: BedloopEvent[]) => void): Promise<void>;
     getDestinations(): Promise<Destination[]>;
     getListings(): Promise<Listing[]>;
+    getPhotosByListing(listingId: string): Promise<Photo[]>;
     disconnect(): void;
 }
 

@@ -13,11 +13,11 @@ export async function getListings(baseUrl: string, token: string): Promise<Listi
   const response = await axios.get(url, { headers })
 
   if (!response.data) {
-    throw new Error('No data received from getBookingByDate')
+    throw new Error('No data received from getListings')
   }
 
   if (!Array.isArray(response.data.data)) {
-    throw new Error('Invalid data format received from getBookingByDate')
+    throw new Error('Invalid data format received from getListings')
   }
   return response.data.data as Listing[]
 }

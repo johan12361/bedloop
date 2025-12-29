@@ -13,11 +13,11 @@ export async function getMessages(baseUrl: string, token: string, bookingId: str
   const response = await axios.get(url, { headers })
 
   if (!response.data) {
-    throw new Error('No data received from getBookingByDate')
+    throw new Error('No data received from getMessages')
   }
 
   if (!Array.isArray(response.data.data)) {
-    throw new Error('Invalid data format received from getBookingByDate')
+    throw new Error('Invalid data format received from getMessages')
   }
   return response.data.data as Conversation[]
 }

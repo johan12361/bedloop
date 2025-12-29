@@ -73,10 +73,10 @@ async function getMessages(baseUrl, token, bookingId) {
   };
   const response = await axios3.get(url, { headers });
   if (!response.data) {
-    throw new Error("No data received from getBookingByDate");
+    throw new Error("No data received from getMessages");
   }
   if (!Array.isArray(response.data.data)) {
-    throw new Error("Invalid data format received from getBookingByDate");
+    throw new Error("Invalid data format received from getMessages");
   }
   return response.data.data;
 }
@@ -282,10 +282,28 @@ async function getListings(baseUrl, token) {
   };
   const response = await axios5.get(url, { headers });
   if (!response.data) {
-    throw new Error("No data received from getBookingByDate");
+    throw new Error("No data received from getListings");
   }
   if (!Array.isArray(response.data.data)) {
-    throw new Error("Invalid data format received from getBookingByDate");
+    throw new Error("Invalid data format received from getListings");
+  }
+  return response.data.data;
+}
+
+// src/client/request/getPhotosByListing.ts
+import axios6 from "axios";
+async function getPhotosByListing(baseUrl, token, id) {
+  const url = `${baseUrl}/api/v1/photos?listing_id=${id}`;
+  const headers = {
+    Accept: "application/json",
+    Authorization: `Bearer ${token}`
+  };
+  const response = await axios6.get(url, { headers });
+  if (!response.data) {
+    throw new Error("No data received from getPhotosByListing");
+  }
+  if (!Array.isArray(response.data.data)) {
+    throw new Error("Invalid data format received from getPhotosByListing");
   }
   return response.data.data;
 }
@@ -348,6 +366,10 @@ var Client = class {
   async getListings() {
     const auth = await this.getAuthorization();
     return getListings(this.options.url, auth.token);
+  }
+  async getPhotosByListing(listingId) {
+    const auth = await this.getAuthorization();
+    return getPhotosByListing(this.options.url, auth.token, listingId);
   }
   disconnect() {
     if (this.tokenRefreshInterval) {
