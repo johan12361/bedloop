@@ -290,15 +290,35 @@ async function getListings(baseUrl, token) {
   return response.data.data;
 }
 
-// src/client/request/getPhotosByListing.ts
+// src/client/request/getAvailability.ts
 import axios6 from "axios";
+async function getAvailability(baseUrl, token, listingId, startDate, endDate) {
+  const url = `${baseUrl}/api/v1/availability`;
+  const headers = {
+    Accept: "application/json",
+    Authorization: `Bearer ${token}`
+  };
+  const params = {
+    listing_id: listingId,
+    from: startDate,
+    to: endDate
+  };
+  const response = await axios6.get(url, { headers, params });
+  if (!response.data) {
+    throw new Error("No data received from getBookingByDate");
+  }
+  return response.data.data;
+}
+
+// src/client/request/getPhotosByListing.ts
+import axios7 from "axios";
 async function getPhotosByListing(baseUrl, token, id) {
   const url = `${baseUrl}/api/v1/photos?listing_id=${id}`;
   const headers = {
     Accept: "application/json",
     Authorization: `Bearer ${token}`
   };
-  const response = await axios6.get(url, { headers });
+  const response = await axios7.get(url, { headers });
   if (!response.data) {
     throw new Error("No data received from getPhotosByListing");
   }
@@ -370,6 +390,10 @@ var Client = class {
   async getPhotosByListing(listingId) {
     const auth = await this.getAuthorization();
     return getPhotosByListing(this.options.url, auth.token, listingId);
+  }
+  async getAvailability(listingId, startDate, endDate) {
+    const auth = await this.getAuthorization();
+    return getAvailability(this.options.url, auth.token, listingId, startDate, endDate);
   }
   disconnect() {
     if (this.tokenRefreshInterval) {

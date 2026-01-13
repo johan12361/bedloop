@@ -91,6 +91,19 @@ interface Photo {
     title: string;
 }
 
+interface Availability {
+    listing_id: number;
+    rates: Rate[];
+}
+interface Rate {
+    rate_id: number;
+    dates: RateDate[];
+}
+interface RateDate {
+    date: string;
+    availability: boolean;
+}
+
 interface ClientOptions {
     user: string;
     password: string;
@@ -120,6 +133,7 @@ declare class Client {
     getDestinations(): Promise<Destination[]>;
     getListings(): Promise<Listing[]>;
     getPhotosByListing(listingId: string): Promise<Photo[]>;
+    getAvailability(listingId: string, startDate: string, endDate: string): Promise<Availability>;
     disconnect(): void;
 }
 

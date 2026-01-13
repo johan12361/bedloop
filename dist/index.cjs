@@ -327,15 +327,35 @@ async function getListings(baseUrl, token) {
   return response.data.data;
 }
 
-// src/client/request/getPhotosByListing.ts
+// src/client/request/getAvailability.ts
 var import_axios6 = __toESM(require("axios"), 1);
+async function getAvailability(baseUrl, token, listingId, startDate, endDate) {
+  const url = `${baseUrl}/api/v1/availability`;
+  const headers = {
+    Accept: "application/json",
+    Authorization: `Bearer ${token}`
+  };
+  const params = {
+    listing_id: listingId,
+    from: startDate,
+    to: endDate
+  };
+  const response = await import_axios6.default.get(url, { headers, params });
+  if (!response.data) {
+    throw new Error("No data received from getBookingByDate");
+  }
+  return response.data.data;
+}
+
+// src/client/request/getPhotosByListing.ts
+var import_axios7 = __toESM(require("axios"), 1);
 async function getPhotosByListing(baseUrl, token, id) {
   const url = `${baseUrl}/api/v1/photos?listing_id=${id}`;
   const headers = {
     Accept: "application/json",
     Authorization: `Bearer ${token}`
   };
-  const response = await import_axios6.default.get(url, { headers });
+  const response = await import_axios7.default.get(url, { headers });
   if (!response.data) {
     throw new Error("No data received from getPhotosByListing");
   }
@@ -407,6 +427,10 @@ var Client = class {
   async getPhotosByListing(listingId) {
     const auth = await this.getAuthorization();
     return getPhotosByListing(this.options.url, auth.token, listingId);
+  }
+  async getAvailability(listingId, startDate, endDate) {
+    const auth = await this.getAuthorization();
+    return getAvailability(this.options.url, auth.token, listingId, startDate, endDate);
   }
   disconnect() {
     if (this.tokenRefreshInterval) {

@@ -2,12 +2,14 @@ import { getAuthorization } from './auth/getAuthorization.js'
 import { pollingMessages } from './pollingMessages/pollingMessages.js'
 import { getDestinations } from './request/getDestinations.js'
 import { getListings } from './request/getListings.js'
+import { getAvailability } from './request/getAvailability.js'
 import { getPhotosByListing } from './request/getPhotosByListing.js'
 
 import type { BedloopEvent } from '../types/events.js'
 import type { Destination } from '../types/destination.js'
 import type { Listing } from '../types/listing.js'
 import type { Photo } from '../types/photo.js'
+import type { Availability } from '../types/availability.js'
 
 import type { ClientOptions, Authorization, PollingOptions } from '../types/client.js'
 
@@ -88,6 +90,11 @@ export class Client {
   async getPhotosByListing(listingId: string): Promise<Photo[]> {
     const auth = await this.getAuthorization()
     return getPhotosByListing(this.options.url, auth.token, listingId)
+  }
+
+  async getAvailability(listingId: string, startDate: string, endDate: string): Promise<Availability> {
+    const auth = await this.getAuthorization()
+    return getAvailability(this.options.url, auth.token, listingId, startDate, endDate)
   }
 
   disconnect(): void {
