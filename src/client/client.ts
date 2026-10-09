@@ -1,12 +1,13 @@
 import { getAuthorization } from './auth/getAuthorization.js'
 import { getDestinations } from './request/getDestinations.js'
 import { getListings } from './request/getListings.js'
+import { getListingById } from './request/getListingById.js'
 import { getAvailability } from './request/getAvailability.js'
 import { getPhotosByListing } from './request/getPhotosByListing.js'
 import { getBookingByDate } from './request/getBookingByDate.js'
 
 import type { Destination } from '../types/destination.js'
-import type { Listing } from '../types/listing.js'
+import type { GetListingsParams, Listing, PaginatedListings } from '../types/listing.js'
 import type { Photo } from '../types/photo.js'
 import type { Availability } from '../types/availability.js'
 import type { Booking } from '../types/booking.js'
@@ -50,8 +51,12 @@ export class Client {
 		return await getDestinations(this)
 	}
 
-	async getListings(): Promise<Listing[]> {
-		return await getListings(this)
+	async getListings(params?: GetListingsParams): Promise<PaginatedListings> {
+		return await getListings(this, params)
+	}
+
+	async getListingById(listingId: string | number): Promise<Listing> {
+		return await getListingById(this, listingId)
 	}
 
 	async getPhotosByListing(listingId: string | number): Promise<Photo[]> {
