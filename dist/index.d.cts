@@ -1,27 +1,3 @@
-interface ConversationMessage {
-    id: number;
-    thread_id: number | null;
-    in_out: number;
-    message: string;
-    external_id: string | null;
-    type: string | null;
-    created_at: string;
-}
-
-declare enum EventType {
-    NEW_MESSAGE = "new_message"
-}
-interface BedloopEvent {
-    event: EventType;
-    timestamp: Date;
-    newMessage?: {
-        bookingId?: number;
-        conversationId?: number;
-        messageId?: number;
-        message?: ConversationMessage;
-    };
-}
-
 interface Destination {
     id: number;
     id2?: string;
@@ -104,6 +80,36 @@ interface RateDate {
     availability: boolean;
 }
 
+interface BookingService {
+    id: number;
+    qty: number;
+    price: number;
+}
+interface Booking {
+    booking_number: number;
+    start_date: string;
+    end_date: string;
+    listing_id: number;
+    customer_id: number;
+    state: number;
+    adults: number;
+    children: number;
+    paid: number;
+    arrival_time: string;
+    departure_time: string;
+    source_id: number;
+    deposit: number;
+    total: number;
+    prepaid: number;
+    tourist_tax: number;
+    opening_code: string | null;
+    checkin_completed: boolean;
+    key_numbers: number;
+    notes: string;
+    services: BookingService[];
+    extras: unknown[];
+}
+
 interface ClientOptions {
     user: string;
     password: string;
@@ -114,27 +120,19 @@ interface Authorization {
     token: string;
     expiresAt: Date;
 }
-interface PollingOptions {
-    interval: number;
-    beforeDays: number;
-    afterDays: number;
-    recentMinutes?: number;
-}
 
 declare class Client {
     readonly options: ClientOptions;
-    readonly pollingOptions: PollingOptions;
+    readonly log: (...args: unknown[]) => void;
     private authorization?;
-    private tokenRefreshInterval?;
-    constructor(options: ClientOptions, pollingOptions?: Partial<PollingOptions>);
-    private refreshToken;
+    private authPromise?;
+    constructor(options: ClientOptions);
     getAuthorization(): Promise<Authorization>;
-    connect(callback: (events: BedloopEvent[]) => void): Promise<void>;
     getDestinations(): Promise<Destination[]>;
     getListings(): Promise<Listing[]>;
-    getPhotosByListing(listingId: string): Promise<Photo[]>;
-    getAvailability(listingId: string, startDate: string, endDate: string): Promise<Availability>;
-    disconnect(): void;
+    getPhotosByListing(listingId: string | number): Promise<Photo[]>;
+    getAvailability(listingId: string | number, startDate: string, endDate: string): Promise<Availability>;
+    getBookingByDate(startDate: string, endDate: string): Promise<Booking[]>;
 }
 
-export { type BedloopEvent, Client, type ClientOptions, EventType, type PollingOptions };
+export { type Authorization, type Availability, type Booking, type BookingService, Client, type ClientOptions, type Destination, type Listing, type Photo, type Rate, type RateDate };

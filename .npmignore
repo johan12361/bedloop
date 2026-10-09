@@ -4,8 +4,8 @@ playground/
 
 # Config files
 tsconfig.json
-eslint.config.mjs
-.prettierrc.json
+tsup.config.ts
+biome.json
 
 # Development
 node_modules/
@@ -13,8 +13,10 @@ node_modules/
 .vscode/
 .git/
 .gitignore
+.gitattributes
 
 # Lock files
+bun.lock
+package-lock.json
 pnpm-lock.yaml
 yarn.lock
-package-lock.json

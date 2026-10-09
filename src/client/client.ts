@@ -1,109 +1,68 @@
 import { getAuthorization } from './auth/getAuthorization.js'
-import { pollingMessages } from './pollingMessages/pollingMessages.js'
 import { getDestinations } from './request/getDestinations.js'
 import { getListings } from './request/getListings.js'
 import { getAvailability } from './request/getAvailability.js'
 import { getPhotosByListing } from './request/getPhotosByListing.js'
+import { getBookingByDate } from './request/getBookingByDate.js'
 
-import type { BedloopEvent } from '../types/events.js'
 import type { Destination } from '../types/destination.js'
 import type { Listing } from '../types/listing.js'
 import type { Photo } from '../types/photo.js'
 import type { Availability } from '../types/availability.js'
+import type { Booking } from '../types/booking.js'
 
-import type { ClientOptions, Authorization, PollingOptions } from '../types/client.js'
-
-// default polling options
-const defaultPollingOptions: PollingOptions = {
-  interval: 5000, // 5 segundos
-  beforeDays: 7,
-  afterDays: 30,
-  recentMinutes: 15
-}
+import type { ClientOptions, Authorization } from '../types/client.js'
 
 export class Client {
-  readonly options: ClientOptions
-  readonly pollingOptions: PollingOptions
+	readonly options: ClientOptions
+	readonly log: (...args: unknown[]) => void
+	private authorization?: Authorization
+	private authPromise?: Promise<Authorization>
 
-  private authorization?: Authorization
-  private tokenRefreshInterval?: NodeJS.Timeout
+	constructor(options: ClientOptions) {
+		this.options = options
+		this.log = options.debug === true ? console.log.bind(console, '[Bedloop]') : (): void => {}
+	}
 
-  constructor(options: ClientOptions, pollingOptions: Partial<PollingOptions> = {}) {
-    this.options = options
-    this.pollingOptions = {
-      ...defaultPollingOptions,
-      ...pollingOptions
-    }
-    if (this.options.debug) {
-      console.log('Client initialized')
-    }
-  }
+	async getAuthorization(): Promise<Authorization> {
+		const now = Date.now()
+		const bufferMs = 60 * 1000
 
-  private async refreshToken(): Promise<void> {
-    try {
-      this.authorization = await getAuthorization(this.options)
-      if (this.options.debug) {
-        console.log('Token refreshed:', this.authorization)
-      }
-    } catch (error) {
-      if (this.options.debug) {
-        console.error('Error refreshing token:', error)
-      }
-    }
-  }
+		if (this.authorization && this.authorization.expiresAt.getTime() - bufferMs > now) return this.authorization
 
-  async getAuthorization(): Promise<Authorization> {
-    const now = new Date()
-    if (!this.authorization || this.authorization.expiresAt <= now) {
-      this.authorization = await getAuthorization(this.options)
-    }
-    return this.authorization
-  }
+		if (this.authPromise) return await this.authPromise
 
-  async connect(callback: (events: BedloopEvent[]) => void): Promise<void> {
-    await this.getAuthorization()
-    if (this.options.debug) {
-      console.log('Connected:', this.authorization)
-    }
+		this.authPromise = (async (): Promise<Authorization> => {
+			try {
+				const auth = await getAuthorization(this)
+				this.authorization = auth
+				this.log(`Token refreshed at ${auth.expiresAt.toISOString()}`)
+				return auth
+			} finally {
+				this.authPromise = undefined
+			}
+		})()
 
-    // Refrescar token cada 12 horas
-    this.tokenRefreshInterval = setInterval(
-      () => {
-        void this.refreshToken()
-      },
-      12 * 60 * 60 * 1000
-    )
+		return await this.authPromise
+	}
 
-    pollingMessages(this.options, () => this.authorization!, this.pollingOptions, callback)
-  }
+	async getDestinations(): Promise<Destination[]> {
+		return await getDestinations(this)
+	}
 
-  async getDestinations(): Promise<Destination[]> {
-    const auth = await this.getAuthorization()
-    return getDestinations(this.options.url, auth.token)
-  }
+	async getListings(): Promise<Listing[]> {
+		return await getListings(this)
+	}
 
-  async getListings(): Promise<Listing[]> {
-    const auth = await this.getAuthorization()
-    return getListings(this.options.url, auth.token)
-  }
+	async getPhotosByListing(listingId: string | number): Promise<Photo[]> {
+		return await getPhotosByListing(this, listingId)
+	}
 
-  async getPhotosByListing(listingId: string): Promise<Photo[]> {
-    const auth = await this.getAuthorization()
-    return getPhotosByListing(this.options.url, auth.token, listingId)
-  }
+	async getAvailability(listingId: string | number, startDate: string, endDate: string): Promise<Availability> {
+		return await getAvailability(this, listingId, startDate, endDate)
+	}
 
-  async getAvailability(listingId: string, startDate: string, endDate: string): Promise<Availability> {
-    const auth = await this.getAuthorization()
-    return getAvailability(this.options.url, auth.token, listingId, startDate, endDate)
-  }
-
-  disconnect(): void {
-    if (this.tokenRefreshInterval) {
-      clearInterval(this.tokenRefreshInterval)
-      this.tokenRefreshInterval = undefined
-    }
-    if (this.options.debug) {
-      console.log('Client disconnected')
-    }
-  }
+	async getBookingByDate(startDate: string, endDate: string): Promise<Booking[]> {
+		return await getBookingByDate(this, startDate, endDate)
+	}
 }
