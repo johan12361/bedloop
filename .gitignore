@@ -1,5 +1,9 @@
 .vscode
 node_modules
+dist
+coverage
 *.log
-playground/*
+.env
+.env.*
+playground
 README.ES.md
